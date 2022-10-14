@@ -68,6 +68,7 @@ body{
 }
 
 
+
 #mainframe{
     position: relative;
     width: 100%;
@@ -76,7 +77,7 @@ body{
     #mainTableDiv{
         position: absolute;
         top: 0vh;
-        left: 15vw;
+        left: 14vw;
     }
     #mainTable{
         border-spacing: 0;
@@ -89,37 +90,38 @@ body{
     }
     .pixelimg{
         position: relative;
-        width: 3.67vw;
-        height: 5.45vh;
-        /* width: 3.2vw;
+        width: 2.9vw;
+        height: 5.86vh;
+        /* width: 2.9vw;
         aspect-ratio: 1/1; */
         display: block;
         padding: 0;
     }
     .dirtimg{
         position: relative;
-        width: 3.67vw;
-        height: 5.45vh;
-        /* width: 3.2vw;
+        width: 2.9vw;
+        height: 5.86vh;
+        /* width: 2.9vw;
         aspect-ratio: 1/1; */
         display: block;
         padding: 0;    
     }
     .grassimg{
         position: relative;
-        width: 3.67vw;
-        height: 5.45vh;
-        /* width: 3.2vw;
+        width: 2.9vw;
+        height: 5.86vh;
+        /* width: 2.9vw;
         aspect-ratio: 1/1; */
         display: block;
         padding: 0;    
     }
     .towerDropDiv{
         position: absolute;
-        top: 0.4vh;
-        left: 0.2vw;
-        width: 3.3vw;
-        height: 4.6vh;
+        top: 1vh;
+        left: 0.5vw;
+        width: 2vw;
+        height: 4.1vh;
+        /* aspect-ratio: 1/1; */
         display: block;
         padding: 0;
         background-color: rgba(255, 255, 255, 0);
@@ -129,10 +131,10 @@ body{
     }
     .spellDropDiv{
         position: absolute;
-        top: 0.4vh;
-        left: 0.2vw;
-        width: 3.3vw;
-        height: 4.6vh;
+        top: 1vh;
+        left: 0.5vw;
+        width: 2vw;
+        height: 4.1vh;
         display: block;
         padding: 0;
         background-color: rgba(255, 255, 255, 0);
@@ -142,10 +144,11 @@ body{
     }
     .dropedTower{
         position: absolute;
-        top: -0.5vh;
-        left: -0.2vw;
-        width: 3.4vw;
+        top: -0.8vh;
+        left: -0.4vw;
+        width: 2.3vw;
         height: 4.8vh;
+        aspect-ratio: 1/1;
         padding: 0;
         z-index: 4;
     }
@@ -508,3 +511,144 @@ animation: fadeinout 0.25s linear forwards;
         opacity: 1;
     } 
 }
+
+
+.mainAnimation{ /*112 перехода на 31 мува в сторону. 100%/112 = 1 переход */
+    animation: mainAnimation 80s linear forwards ;/*2.9w  5.87h */
+}
+@keyframes mainAnimation {
+    0% {
+        transform: translate(-0.8vw, 0.49vh);
+    }
+    3.571%{
+        transform: translate(10.95vw, 0.49vh);
+    }
+    6.25%{
+        transform: translate(10.95vw, 18.1vh);
+    }
+    8.035%{
+        transform: translate(5.15vw, 18.1vh);
+    }
+    10.71%{
+        transform: translate(5.15vw, 35.71vh);
+    }
+    14.28%{
+        transform: translate(16.75vw, 35.71vh);
+    }
+    17.86%{
+        transform: translate(16.75vw, 12.23vh);
+    }
+    20.54%{
+        transform: translate(25.45vw, 12.23vh);
+    }
+    24.1%{
+        transform: translate(25.45vw, 35.71vh);
+    }
+    25.89%{
+        transform: translate(31.25vw, 35.71vh);
+    }
+    31.25%{
+        transform: translate(31.25vw, 0.49vh);
+    }
+    33.93%{
+        transform: translate(39.95vw, 0.49vh);
+    }
+    34.82%{
+        transform: translate(39.95vw, 6.36vh);
+    }
+    39.29%{
+        transform: translate(54.45vw, 6.36vh);
+    }
+    42.86%{
+        transform: translate(54.45vw, 29.84vh);
+    }
+    44.64%{
+        transform: translate(48.65vw, 29.84vh);
+    }
+    46.43%{
+        transform: translate(48.65vw, 18.1vh);
+    }
+    49.1%{
+        transform: translate(39.95vw, 18.1vh);
+    }
+    55.35%{
+        transform: translate(39.95vw, 59.14vh);
+    }
+    57.14%{
+        transform: translate(45.75vw, 59.14vh);
+    }
+    59.82%{
+        transform: translate(45.75vw, 41.53vh);
+    }
+    62.5%{
+        transform: translate(54.45vw, 41.53vh);
+    }
+    64.29%{
+        transform: translate(54.45vw, 53.27vh);
+    }
+    65.18%{
+        transform: translate(51.55vw, 53.27vh);
+    }
+    67.86%{
+        transform: translate(51.55vw, 70.88vh);
+    }
+    77.68%{
+        transform: translate(19.65vw, 70.88vh);
+    }
+    79.46%{
+        transform: translate(19.65vw, 59.14vh);
+    }
+    83.93%{
+        transform: translate(34.15vw, 59.14vh);
+    }
+    85.71%{
+        transform: translate(34.15vw, 47.4vh);
+    }
+    94.64%{
+        transform: translate(5.2vw, 47.4vh);
+    }
+    98.21%{
+        transform: translate(5.2vw, 70.9vh);   
+    }
+    99.99%{
+        transform: translate(-0.8vw, 70.9vh);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-0.8vw, 70.9vh);
+        opacity: 0;
+    } 
+}
+.glowSpell{
+    box-shadow: 0px 0px 0.5vw 0.4vw #0ff;
+}
+.glowTower{
+    box-shadow: 0px 0px 0.5vw 0.4vw rgb(255, 0, 0);
+}
+.cancelDiv{
+    width: 6vw;
+    height: 4vh;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    align-items: center;
+    padding: 0;
+    z-index: 5;
+    left: 42%;
+    top: 2%;
+    background-color: red;
+    border-radius: 1vw;
+    font-size: 0.7vw;
+
+}
+.rotateBullet{
+    animation: rotateBullet 0.5s forwards;
+}
+@keyframes rotateBullet {
+    0% {
+        transform: scale(1) rotate(0);
+    }
+    100% {
+        transform:  scale(6) rotate(360deg);
+    }
+} 

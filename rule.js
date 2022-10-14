@@ -6,14 +6,52 @@ let left = 1;
 var imgId = 0;
 let about = 0;
 let towerSelling;
-// clone of empty div to remove existing event listeners
-let emptyDiv = document.getElementById("divToCopy");
-let fullDiv;
+let stunImgId = 0;
+let dropRadius;
+let stopimgId = 0;
+document.getElementById("розлитиПиво").addEventListener("click",pivoSpell)
+
+
+let grassTile = document.querySelectorAll(".towerDropDiv")
+for(let i=0; i< grassTile.length; i++) {
+    grassTile[i].addEventListener("dragover",allowDrop)
+    grassTile[i].addEventListener("drop",drop)
+}
+let dirtTile = document.querySelectorAll(".spellDropDiv")
+for(let i=0; i<dirtTile.length; i++) {
+    dirtTile[i].addEventListener("dragover",allowdropSpell)
+    dirtTile[i].addEventListener("drop",dropSpell)
+}  
+
+let towerimg = document.querySelectorAll(".towerimg")
+for(let i=0; i<towerimg.length; i++) {
+    towerimg[i].addEventListener("dragstart",drag)
+    towerimg[i].addEventListener("dragend",dragEnd)
+    towerimg[i].addEventListener("mouseover",displayStats)
+    towerimg[i].addEventListener("mouseout",hideRadius)
+} 
+// Waves:
+let allWaves = [
+{name:"Філянін", amount:"3"},
+{name:"Сторожилова", amount:"2"},
+{name:"Розен", amount:"1"},
+{name:"Куліш", amount:"4"},
+// {name:"Калінчик", amount:"2"},
+// {name:"Дубровська", amount:"2"},
+// {name:"Босак", amount:"3"},
+{name:"Філянін", amount:"5"},
+{name:"Філянін", amount:"5"},
+{name:"Філянін", amount:"5"},
+{name:"Філянін", amount:"5"},
+{name:"Філянін", amount:"5"},
+{name:"Філянін", amount:"5"},
+{name:"Філянін", amount:"6"},
+{name:"Філянін", amount:"7"},
+]
+
+
 //starting parametres of wave
-waveCount = 1;
-mobName = 'куліш';
-mobQuantity = 1;
-waitTime = 1000;
+waveCount = 0
 var hpBarId = "bar0";
 let panelCount = 0;
 //all audio to play
@@ -85,15 +123,15 @@ let radDiv = document.getElementById('radDiv');
 
     //tower parametres
     tower1 = document.getElementById('кузь');
-    tower1.setAttribute('radius',100);
+    tower1.setAttribute('radius',1);
     tower1.setAttribute('damage', 1);
     tower1.setAttribute('fireRate', 1);
     tower1.setAttribute('name', 'Євгеній');
     tower1.setAttribute('cost', 100);
-    tower1.setAttribute('special', "none");
+    tower1.setAttribute('special', "Solar panel power +5");
     
     tower2 = document.getElementById('мінченко');
-    tower2.setAttribute('radius',100);
+    tower2.setAttribute('radius',2);
     tower2.setAttribute('damage', 2);
     tower2.setAttribute('fireRate', 2);
     tower2.setAttribute('name', 'Констянтин');
@@ -101,7 +139,7 @@ let radDiv = document.getElementById('radDiv');
     tower2.setAttribute('special', "none");
     
     tower3 = document.getElementById('мороз');
-    tower3.setAttribute('radius',100);
+    tower3.setAttribute('radius',1);
     tower3.setAttribute('damage', 0.5);
     tower3.setAttribute('fireRate', 0.5);
     tower3.setAttribute('name', 'Андрій');
@@ -109,7 +147,7 @@ let radDiv = document.getElementById('radDiv');
     tower3.setAttribute('special', "none");
     
     tower4 = document.getElementById('колесніков');
-    tower4.setAttribute('radius',100);
+    tower4.setAttribute('radius',1);
     tower4.setAttribute('damage', 1);
     tower4.setAttribute('fireRate', 1);
     tower4.setAttribute('name', 'Михайло');
@@ -117,42 +155,42 @@ let radDiv = document.getElementById('radDiv');
     tower4.setAttribute('special', "none");
 
     tower5 = document.getElementById('сергієнко');
-    tower5.setAttribute('radius',100);
+    tower5.setAttribute('radius',1);
     tower5.setAttribute('damage', 1);
     tower5.setAttribute('fireRate', 1);
-    tower5.setAttribute('name', 'Влад');
+    tower5.setAttribute('name', 'Владислав');
     tower5.setAttribute('cost', 100);
-    tower5.setAttribute('special', "none");
+    tower5.setAttribute('special', "stun target for 0.25s");
 
     tower6 = document.getElementById('маламан');
-    tower6.setAttribute('radius',100);
+    tower6.setAttribute('radius',1);
     tower6.setAttribute('damage', 1);
     tower6.setAttribute('fireRate', 1);
     tower6.setAttribute('name', 'Дімітрій');
     tower6.setAttribute('cost', 100);
     tower6.setAttribute('special', "none");
 
-    tower7 = document.getElementById('кузь');
-    tower7.setAttribute('radius',100);
+    tower7 = document.getElementById('лівіщенко');
+    tower7.setAttribute('radius',1);
     tower7.setAttribute('damage', 1);
     tower7.setAttribute('fireRate', 1);
-    tower7.setAttribute('name', 'Євгеній');
+    tower7.setAttribute('name', 'Дмитро');
     tower7.setAttribute('cost', 100);
     tower7.setAttribute('special', "none");
 
-    tower8 = document.getElementById('кузь');
-    tower8.setAttribute('radius',100);
-    tower8.setAttribute('damage', 1);
-    tower8.setAttribute('fireRate', 1);
-    tower8.setAttribute('name', 'Євгеній');
+    tower8 = document.getElementById('караульний');
+    tower8.setAttribute('radius',1);
+    tower8.setAttribute('damage', 0);
+    tower8.setAttribute('fireRate', 10);
+    tower8.setAttribute('name', 'Кирило');
     tower8.setAttribute('cost', 100);
-    tower8.setAttribute('special', "none");
+    tower8.setAttribute('special', "30% dmg boost for 5 sec(not stackable)");
 
-    tower9 = document.getElementById('кузь');
-    tower9.setAttribute('radius',100);
+    tower9 = document.getElementById('петровський');
+    tower9.setAttribute('radius',1);
     tower9.setAttribute('damage', 1);
     tower9.setAttribute('fireRate', 1);
-    tower9.setAttribute('name', 'Євгеній');
+    tower9.setAttribute('name', 'Орест');
     tower9.setAttribute('cost', 100);
     tower9.setAttribute('special', "none");
 
@@ -161,12 +199,13 @@ let radDiv = document.getElementById('radDiv');
     spell1.setAttribute('name', 'Розлити пиво');
     spell1.setAttribute('cost', 50);
     spell1.setAttribute('power',100);
+    spell1.setAttribute('radius',1);
     spell1.setAttribute('special',"Вороги зупиняються на двох обраних блоках впродовж 4сек");
 
     spell2 = document.getElementById('панель');
     spell2.setAttribute('name', 'Спиздити панель');
     spell2.setAttribute('cost', 50);
-    spell2.setAttribute('power',100);
+    spell2.setAttribute('power',5);
     spell2.setAttribute('special',"На початку нової хвилі ви отримуєте 5 золота (можна продати за золото)");
     
     spell3= document.getElementById('автомат');
@@ -178,7 +217,7 @@ let radDiv = document.getElementById('radDiv');
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms))
-    };
+};
 async function nextText(){
     document.getElementById("nextText").remove();
     document.getElementById("pre1").style.opacity = 0;
@@ -231,7 +270,7 @@ function audioPausePlay() {
     music = document.getElementById("music")
     backgroundMusic.paused ? backgroundMusic.play() : backgroundMusic.pause();
     backgroundMusic.paused ? music.setAttribute("src","pictures/music.jpg") : music.setAttribute("src","pictures/musicoff.png");
-  }
+}
 async function spinbiden(){
     document.getElementById("bidenDiv").classList.add("spinning")
     await sleep(3000)
@@ -240,7 +279,14 @@ async function spinbiden(){
     document.getElementById("bidenDiv").classList.remove("spinning")
     document.getElementById("bidenDiv").classList.remove("fading")
 }
-
+function addMoney(){
+    money = document.getElementById("money").innerText;
+    document.getElementById("money").innerText = Number(money) + Number(1000); 
+}
+function addMana(){
+    mana = document.getElementById("mana").innerText;
+    document.getElementById("mana").innerText = Number(mana) + Number(1000); 
+}
 
 
 
@@ -250,86 +296,36 @@ async function healReload(picture){
     await sleep(7000);
     picture.setAttribute('ready', 1);
     picture.setAttribute('healReloading', 0);
-    };
+};
 async function reloadFunction(ftd,i,fireRate){
     fireRate *= 1000;
     await sleep(fireRate);
     ftd[i].setAttribute('ready' , 1);
-    };
+};
 async function declarationReloadFunction(tower,fireRate){
     fireRate *= 1000;
     await sleep(fireRate);
     tower.setAttribute('ready' , 1);
-    };
-function died(pict,hpBar,cost){
-    let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    }; 
 };
+
 
 function nextWave(){
     money = document.getElementById("money").innerText;
-    document.getElementById("money").innerText = Number(money) + Number(panelCount*5);
+    document.getElementById("money").innerText =
+    Number(money) + Number(panelCount*document.getElementById("панель").getAttribute("power"));
 
     unit = document.getElementById("p24");
     amount = document.getElementById("p25");
     skill = document.getElementById("p26");;
-    if (waveCount == 1){
-        mobName = "Філянін"; mobQuantity = 2; waitTime = 1000;
-        runMob(mobName,mobQuantity,waitTime)
-        unit.innerText = "Unit: "+mobName;
-        amount.innerText = "Amount: "+mobQuantity;
-        skill.innerText = "Skill: "+document.getElementById(mobName).getAttribute("special");
-    }
-    if (waveCount == 2){
-        mobName = "Сторожилова"; mobQuantity = 2; waitTime = 1000;
-        runMob(mobName,mobQuantity,waitTime)
-        unit.innerText = "Unit: "+mobName;
-        amount.innerText = "Amount: "+mobQuantity;
-        skill.innerText = "Skill: "+document.getElementById(mobName).getAttribute("special");
-    }
-    if (waveCount == 3){
-        mobName = "Розен"; mobQuantity = 2; waitTime = 1000;
-        runMob(mobName,mobQuantity,waitTime)
-        unit.innerText = "Unit: "+mobName;
-        amount.innerText = "Amount: "+mobQuantity;
-        skill.innerText = "Skill: "+document.getElementById(mobName).getAttribute("special");
-    }
-    if (waveCount == 4){
-        mobName = "Куліш"; mobQuantity = 2; waitTime = 1000;
-        runMob(mobName,mobQuantity,waitTime)
-        unit.innerText = "Unit: "+mobName;
-        amount.innerText = "Amount: "+mobQuantity;
-        skill.innerText = "Skill: "+document.getElementById(mobName).getAttribute("special");
-    }
-    if (waveCount == 5){
-        mobName = "Калінчик"; mobQuantity = 2; waitTime = 1000;
-        runMob(mobName,mobQuantity,waitTime)
-        unit.innerText = "Unit: "+mobName;
-        amount.innerText = "Amount: "+mobQuantity;
-        skill.innerText = "Skill: "+document.getElementById(mobName).getAttribute("special");
-    }
-    if (waveCount == 6){
-        mobName = "Дубровська"; mobQuantity = 2; waitTime = 1000;
-        runMob(mobName,mobQuantity,waitTime)
-        unit.innerText = "Unit: "+mobName;
-        amount.innerText = "Amount: "+mobQuantity;
-        skill.innerText = "Skill: "+document.getElementById(mobName).getAttribute("special");
-    }
-    if (waveCount == 7){
-        mobName = "Босак"; mobQuantity = 2; waitTime = 1000;
-        runMob(mobName,mobQuantity,waitTime)
-        unit.innerText = "Unit: "+mobName;
-        amount.innerText = "Amount: "+mobQuantity;
-        skill.innerText = "Skill: "+document.getElementById(mobName).getAttribute("special");
-    }
+    let mobName = (allWaves[waveCount].name)
+    let mobQuantity = (allWaves[waveCount].amount)
+    let waitTime = 1000;
+    runMob(mobName,mobQuantity,waitTime)
+    unit.innerText = "Unit: "+mobName;
+    amount.innerText = "Amount: "+mobQuantity;
+    skill.innerText = "Skill: "+document.getElementById(mobName).getAttribute("special");
     waveCount += 1;
-};
+}
 
 async function runMob(mobName,mobQuantity,waitTime){    
     for(var i = 0; i < mobQuantity; i++){
@@ -337,18 +333,10 @@ async function runMob(mobName,mobQuantity,waitTime){
         await sleep(waitTime);
     }
 };
-async function getInvisibility(pict){
-    pict.setAttribute("invisible", 1);
-    pict.setAttribute("invisibleDone", 1);
-    pict.style.opacity = 0.3;
-    await sleep(7000);
-    pict.style.opacity = 1;
-    pict.setAttribute("invisible", 0);
-}
 function moveByPath(mobName) {
     let hpBar = document.createElement("hpBar");
-    hpBar.style.width = "3vw";
-    hpBar.style.height = "0.5vh"; 
+    hpBar.style.width = "2.2vw";
+    hpBar.style.height = "0.3vh"; 
     hpBar.style.display = "block";
     hpBar.style.position = "absolute";
     hpBar.style.padding = "0";
@@ -365,7 +353,8 @@ function moveByPath(mobName) {
     img.src = "pictures/" + mobName + ".jpg";
     img.classList.add("mobOnField");
     
-    img.style.width = "3vw";
+    img.style.width = "2.2vw";
+    img.style.opacity = "1";
     img.style.height = "4.5vh";
     img.style.display = "block";
     img.style.position = "absolute";
@@ -373,6 +362,10 @@ function moveByPath(mobName) {
     img.style.zIndex = "4";
     img.style.top = topp + "vh"; 
     img.style.left = left + "vw";
+    img.setAttribute("stunned",0)
+    img.setAttribute("stopped",0)
+    img.setAttribute("finished",0);
+    img.addEventListener("animationend",function(){setfinish(img)})
     document.getElementById('mainTable').appendChild(img);
     mobType = document.getElementById(mobName);
     if (mobName == "Дубровська"){
@@ -386,2582 +379,238 @@ function moveByPath(mobName) {
     imgId += 1;
     if (mobName == "Куліш"){
         changeCoord(img,topp,left,hpBar,cost,mobName);
+        animateOne(img,hpBar,cost,mobName);
     }
     if (mobName == "Сторожилова"){
         changeCoord(img,topp,left,hpBar,cost,mobName);
+        animateOne(img,hpBar,cost,mobName);
     }
     if (mobName == "Розен"){
         changeCoord(img,topp,left,hpBar,cost,mobName);
+        animateOne(img,hpBar,cost,mobName);
     }
     if (mobName == "Філянін"){
         changeCoord(img,topp,left,hpBar,cost,mobName);
+        animateOne(img,hpBar,cost,mobName);
     }
     if (mobName == "Калінчик"){
         changeCoordКалінчик(img,topp,left,hpBar,cost,mobName);
+        animateOne(img,hpBar,cost,mobName);
     }
     if (mobName == "Дубровська"){
         changeCoordДубровська(img,topp,left,hpBar,cost,mobName);
+        animateOne(img,hpBar,cost,mobName);
     }
     if (mobName == "Босак"){
         changeCoordБосак(img,topp,left,hpBar,cost,mobName);
+        animateOne(img,hpBar,cost,mobName);
     }
 };
-async function changeCoord(pict,up,onleft,hpBar,cost){
-    let times = 70;
+function setfinish(img){
+    img.setAttribute("finished",1);
+};
+function animateOne(img,hpBar,cost,mobName){
+    img.classList.add("mainAnimation")
+    hpBar.classList.add("mainAnimation")
+};
+async function changeCoord(pict,up,onleft,hpBar,cost,mobName){
+    let times = 2000;
     for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
+    let life = pict.getAttribute('life');
     if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += 0;
-        onleft += 0.2;;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);
-        await sleep(50);
-        };  
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-        };
-        times = 37;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-        };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-        };
-        times = 74;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += -0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw"
-        frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-        };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 37;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 82;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 54;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 123;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 36;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 14;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 74;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 92;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 27;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 147;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 54;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 36;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
+    money = document.getElementById("money").innerText;
+    document.getElementById("money").innerText = Number(money) + Number(cost); 
+    let allStunImg = document.querySelectorAll('img[iAmStunPicture]');
+    console.log(allStunImg)
+    for(var b = 0; b < allStunImg; b++){
+        demandedId = allStunImg[b].getAttribute("id")
+        console.log("demandedId ", demandedId)
+        if (document.querySelectorAll('img['+demandedId+']').length){}
+        else{console.log("demandedId pict remove ", demandedId)
+        allStunImg[b].remove()}
+    }
+    if (document.getElementById(pict.getAttribute("stunImgId"))){
+        document.getElementById(pict.getAttribute("stunImgId")).remove()
+    }
+    if (document.getElementById(pict.getAttribute("stopImgId"))){
+        document.getElementById(pict.getAttribute("stopImgId")).remove()
+    }
+    pict.remove();
+    hpBar.remove();
+    return
+    };   
+    if (pict.getAttribute("finished") == 1){
+    if (document.getElementById(pict.getAttribute("stunImgId"))){
+        document.getElementById(pict.getAttribute("stunImgId")).remove()
+    }
+    if (document.getElementById(pict.getAttribute("stopImgId"))){
+        document.getElementById(pict.getAttribute("stopImgId")).remove()
+    }
     pict.remove();
     hpBar.remove();
     lifeLoss.play();
+    return
+    }
+    // up += 0;
+    // onleft += 0.2;;
+    // hpBar.style.top = up + "vh"; 
+    // hpBar.style.left = onleft + "vw";
+    // pict.style.top = up + "vh"; 
+    // pict.style.left = onleft + "vw";
+    frameAction(pict,hpBar,mobName);
+    await sleep(50);
+    };
+
+
 };
 async function changeCoordКалінчик(pict,up,onleft,hpBar,cost,mobName){
     pict.setAttribute("invisible", 0);
     pict.setAttribute("invisibleDone", 0);
-    let times = 70;
+    let times = 2000;
     for(var i = 0; i < times; i++){
         let life = pict.getAttribute('life');
         let invisible = pict.getAttribute("invisible");
         let invisibleDone = pict.getAttribute("invisibleDone");
     if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
+    money = document.getElementById("money").innerText;
+    document.getElementById("money").innerText = Number(money) + Number(cost);
+    if (document.getElementById(pict.getAttribute("stunImgId"))){
+        document.getElementById(pict.getAttribute("stunImgId")).remove()
+    }
+    if (document.getElementById(pict.getAttribute("stopImgId"))){
+        document.getElementById(pict.getAttribute("stopImgId")).remove()
+    } 
+    pict.remove();
+    hpBar.remove();
+    return
     };  
-    if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-        getInvisibility(pict);
-    };
-        up += 0;
-        onleft += 0.2;;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 37;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 74;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += 0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += -0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += 0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 37;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += 0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 82;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += -0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 54;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += 0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 123;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 36;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 14;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += -0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 74;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 92;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += 0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 27;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 147;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 54;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += -0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
-        times = 36;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    let invisible = pict.getAttribute("invisible");
-        let invisibleDone = pict.getAttribute("invisibleDone");
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };  
-        if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
-            getInvisibility(pict);
-        }
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        if (invisible == 0){
-            frameAction(pict,hpBar,mobName);;
-        }
-        await sleep(50);
-        };  
+    if (pict.getAttribute("finished") == 1){
+    if (document.getElementById(pict.getAttribute("stunImgId"))){
+        document.getElementById(pict.getAttribute("stunImgId")).remove()
+    }
+    if (document.getElementById(pict.getAttribute("stopImgId"))){
+        document.getElementById(pict.getAttribute("stopImgId")).remove()
+    } 
     pict.remove();
     hpBar.remove();
     lifeLoss.play();
+    return
+    } 
+    if (Number(life) < Number(document.getElementById(mobName).getAttribute("life")) && invisibleDone == 0 ){
+        getInvisibility(pict);
+    };
+    // up += 0;
+    // onleft += 0.2;;
+    // hpBar.style.top = up + "vh"; 
+    // hpBar.style.left = onleft + "vw";
+    // pict.style.top = up + "vh"; 
+    // pict.style.left = onleft + "vw";
+    if (invisible == 0){
+        frameAction(pict,hpBar,mobName);;
+    }
+    await sleep(50);
+    };  
 };
 async function changeCoordДубровська(pict,up,onleft,hpBar,cost,mobName){
     pict.setAttribute('ready', 0);
     pict.setAttribute('healReloading', 0);
-    let times = 70;
+    let times = 2000;
     for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
+    let life = pict.getAttribute('life');
     if (life <= 0) {
         money = document.getElementById("money").innerText;
         document.getElementById("money").innerText = Number(money) + Number(cost); 
         pict.remove();
         hpBar.remove();
+        if (document.getElementById(pict.getAttribute("stunImgId"))){
+            document.getElementById(pict.getAttribute("stunImgId")).remove()
+        }
+        if (document.getElementById(pict.getAttribute("stopImgId"))){
+            document.getElementById(pict.getAttribute("stopImgId")).remove()
+        }
         return
-    };
-        up += 0;
-        onleft += 0.2;;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-        };  
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-        };
-        times = 37;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-        };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-        };
-        times = 74;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-        up += -0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw"
-        frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-        };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 37;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 82;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 54;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 123;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 36;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 14;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 74;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 92;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 27;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 147;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 54;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
-        times = 36;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        pict.remove();
-        hpBar.remove();
-        return
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        HealframeAction(pict);
-        await sleep(50);
-            };
+        }; 
+    if (pict.getAttribute("finished") == 1){
     pict.remove();
     hpBar.remove();
     lifeLoss.play();
+    return
+    }; 
+    // up += 0;
+    // onleft += 0.2;;
+    // hpBar.style.top = up + "vh"; 
+    // hpBar.style.left = onleft + "vw";
+    // pict.style.top = up + "vh"; 
+    // pict.style.left = onleft + "vw";
+    frameAction(pict,hpBar,mobName);;
+    HealframeAction(pict);
+    await sleep(50);
+    };  
 };
 async function changeCoordБосак(pict,up,onleft,hpBar,cost,mobName){
     let lifeLossedCounter = 0;
-    let times = 70;
+    let times = 2000;
     for(var i = 0; i < times; i++){
         let life = pict.getAttribute('life');
     if (life <= 0) {
-        money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-         
-    };
-        up += 0;
-        onleft += 0.2;;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);
-        await sleep(50);
-        };  
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-        };
-        times = 37;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-        up += 0;
-        onleft += -0.2;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-        };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-        up += 0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw";
-        frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-        };
-        times = 74;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-        up += -0.4;
-        onleft += 0;
-        hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-        pict.style.top = up + "vh"; 
-        pict.style.left = onleft + "vw"
-        frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-        };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 37;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 82;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 54;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 123;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 36;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 14;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 74;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 92;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += 0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 27;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 147;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 54;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += -0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 55;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 41;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0.4;
-            onleft += 0;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
-        times = 36;   
-    for(var i = 0; i < times; i++){
-        let life = pict.getAttribute('life');
-    if (life <= 0) {
-         money = document.getElementById("money").innerText;
-        if (lifeLossedCounter == 3){ 
-        money = document.getElementById("money").innerText;
-        document.getElementById("money").innerText = Number(money) + Number(cost); 
-        pict.remove();
-        hpBar.remove();
-        return
-        }
-        if (lifeLossedCounter == 2){
-        lifeLossedCounter = 3
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid3.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 1){
-        lifeLossedCounter = 2 
-        hpBar.style.width = "3vw" 
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid2.jpg")
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        }
-        if (lifeLossedCounter == 0){
-        lifeLossedCounter = 1 
-        document.getElementById("money").innerText = Number(money) + Number(cost);
-        mobName = "kid"
-        cost = document.getElementById("kid").getAttribute("cost");
-        hpBar.style.width = "3vw"
-        pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
-        pict.setAttribute("src","pictures/kid1.jpg")
-        }
-    };
-            up += 0;
-            onleft += -0.2;
-            hpBar.style.top = up + "vh"; 
-        hpBar.style.left = onleft + "vw";
-            pict.style.top = up + "vh"; 
-            pict.style.left = onleft + "vw";
-            frameAction(pict,hpBar,mobName);;
-        await sleep(50);
-            };
+    money = document.getElementById("money").innerText;
+    if (lifeLossedCounter == 3){ 
+    money = document.getElementById("money").innerText;
+    document.getElementById("money").innerText = Number(money) + Number(cost); 
+    pict.remove();
+    hpBar.remove();
+    return
+    }
+    if (lifeLossedCounter == 2){
+    lifeLossedCounter = 3
+    hpBar.style.width = "3vw" 
+    pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
+    pict.setAttribute("src","pictures/kid3.jpg")
+    document.getElementById("money").innerText = Number(money) + Number(cost);
+    }
+    if (lifeLossedCounter == 1){
+    lifeLossedCounter = 2 
+    hpBar.style.width = "3vw" 
+    pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
+    pict.setAttribute("src","pictures/kid2.jpg")
+    document.getElementById("money").innerText = Number(money) + Number(cost);
+    }
+    if (lifeLossedCounter == 0){
+    lifeLossedCounter = 1 
+    document.getElementById("money").innerText = Number(money) + Number(cost);
+    mobName = "kid"
+    cost = document.getElementById("kid").getAttribute("cost");
+    hpBar.style.width = "3vw"
+    pict.setAttribute("life", document.getElementById(mobName).getAttribute("life"))
+    pict.setAttribute("src","pictures/kid1.jpg")
+    }
+    if (pict.getAttribute("finished") == 1){
     pict.remove();
     hpBar.remove();
     lifeLoss.play();
+    return
+    }; 
+    };
+    // up += 0;
+    // onleft += 0.2;;
+    // hpBar.style.top = up + "vh"; 
+    // hpBar.style.left = onleft + "vw";
+    // pict.style.top = up + "vh"; 
+    // pict.style.left = onleft + "vw";
+    frameAction(pict,hpBar,mobName);
+    await sleep(50);
+    };  
 };
+
+async function getInvisibility(pict){
+    pict.setAttribute("invisible", 1);
+    pict.setAttribute("invisibleDone", 1);
+    pict.style.opacity = 0.3;
+    await sleep(7000);
+    pict.style.opacity = 1;
+    pict.setAttribute("invisible", 0);
+}
+
 function allowdropSpell(ev) {
     ev.preventDefault();
     radDiv.style.visibility = "hidden";
@@ -2975,12 +624,22 @@ for(let i=0; i<roads.length; i++) {
     roads[i].style.backgroundColor = "rgba(255, 255, 255, 1)";
     roads[i].style.border = "solid rgba(0, 0, 0, 1)";
 }
+let grass = document.querySelectorAll(".towerDropDiv")
+for(let i=0; i<grass.length; i++) {
+    grass[i].removeEventListener("dragover",allowDrop)
+    grass[i].removeEventListener("drop",drop)
+}
 };
 function SpellDragEnd(ev){
     let roads = document.querySelectorAll(".spellDropDiv");
 for(let i=0; i<roads.length; i++) {
     roads[i].style.backgroundColor = "rgba(255, 255, 255, 0)";
     roads[i].style.border = "solid rgba(0, 0, 0, 0)";
+}
+let grass = document.querySelectorAll(".towerDropDiv")
+for(let i=0; i<grass.length; i++) {
+    grass[i].addEventListener("dragover",allowDrop)
+    grass[i].addEventListener("drop",drop)
 }
 radDiv.style.visibility = "hidden";
 }
@@ -3007,13 +666,14 @@ async function dropSpell(ev) {
         document.getElementById("mana").innerText -= cost;
     }
 };
+
 function allowDrop(ev) {
     ev.preventDefault();
     let radDiv = document.getElementById("radDiv");
-    radDiv.style.visibility = "visible";
-    radDiv.style.width = "10vw";
+    radDiv.style.visibility = "visible"; 
+    radDiv.style.width = dropRadius * 10 + "vw";
     radDiv.innerText = "";
-    radDiv.style.height =  radDiv.clientWidth * (100 / document.documentElement.clientWidth) * window.innerWidth / window.innerHeight + "vh";      
+    radDiv.style.height = radius * 20.26 + "vh"; 
     topDist = ev.target.getBoundingClientRect().top * (100 / document.documentElement.clientHeight);
     radiusH = radDiv.clientHeight * (100 / document.documentElement.clientHeight)/2;
     squareRadiusH = ev.target.clientHeight * (100 / document.documentElement.clientHeight)/2;
@@ -3026,19 +686,15 @@ function allowDrop(ev) {
     radDiv.style.left = leftDist - radiusW + squareRadiusW + "vw";
 };
 function drag(ev) {
-let towers = document.querySelectorAll(".towerDropDiv");
-
 ev.dataTransfer.setData("text", ev.target.id);
 ev.dataTransfer.setData("radius", ev.target.getAttribute('radius'));
+dropRadius = ev.target.getAttribute('radius') ;
 ev.dataTransfer.setData("fireRate", ev.target.getAttribute('fireRate'));
 ev.dataTransfer.setData("damage", ev.target.getAttribute('damage'));
 ev.dataTransfer.setData("cost", ev.target.getAttribute('cost'));
 
-for(let i=0; i<towers.length; i++) {
-    towers[i].style.backgroundColor = "rgba(255, 255, 255, 1)";
-    towers[i].style.border = "solid rgba(0, 0, 0, 1)";
-    }
-        
+grassBacklightOn()
+dirtRemoveListener()     
 };
 async function drop(ev) {
     ev.preventDefault();
@@ -3058,6 +714,7 @@ async function drop(ev) {
 
     let clone = document.getElementById(dropEventId).cloneNode(true);
     clone.setAttribute("draggable",false)
+    clone.setAttribute("dmgBoost",0)
     clone.removeAttribute("ondragstart"); 
     clone.removeAttribute("ondragend");
     clone.classList.remove('towerimg');
@@ -3066,13 +723,18 @@ async function drop(ev) {
     clone.classList.add('pixelimg');
     clone.classList.add('dropedTower');
     clone.addEventListener("click",towerOption)
+    clone.removeEventListener("mouseover",displayStats)
+    clone.addEventListener("mouseover",displayDroppedStats)
+    clone.addEventListener("mouseout",hideRadius)
+    clone.removeEventListener("dragstart",drag)
+    clone.removeEventListener("dragend",dragEnd)
     ev.target.append(clone);
 
     ev.target.classList.add('withTower');
 
-    let rect = clone.getBoundingClientRect();//ev.target
-    let midx = rect.left + rect.width/2;
-    let midy = rect.top + rect.height/2;
+    let rect = clone.getBoundingClientRect();
+    let midx = (rect.left + rect.width/2)* 100 / document.documentElement.clientWidth;
+    let midy = (rect.top + rect.height/2)* 100 / document.documentElement.clientHeight;
 
     clone.setAttribute('midx' , midx);
     clone.setAttribute('midy' , midy);
@@ -3124,6 +786,7 @@ async function drop(ev) {
 
     let clone = document.getElementById(dropEventId).cloneNode(true);
     clone.setAttribute("draggable",false)
+    clone.setAttribute("dmgBoost",0)
     clone.removeAttribute("ondragstart"); 
     clone.removeAttribute("ondragend");
     clone.classList.remove('towerimg');
@@ -3132,13 +795,18 @@ async function drop(ev) {
     clone.classList.add('pixelimg');
     clone.classList.add('dropedTower');
     clone.addEventListener("click",towerOption)
+    clone.removeEventListener("mouseover",displayStats)
+    clone.addEventListener("mouseover",displayDroppedStats)
+    clone.addEventListener("mouseout",hideRadius)
+    clone.removeEventListener("dragstart",drag)
+    clone.removeEventListener("dragend",dragEnd)
     ev.target.append(clone);
 
     ev.target.classList.add('withTower');
 
     let rect = ev.target.getBoundingClientRect();
-    let midx = rect.left + rect.width/2;
-    let midy = rect.top + rect.height/2;
+    let midx = (rect.left + rect.width/2)* 100 / document.documentElement.clientWidth;
+    let midy = (rect.top + rect.height/2)* 100 / document.documentElement.clientHeight;
 
 
     clone.setAttribute('midx' , midx);
@@ -3155,15 +823,11 @@ async function drop(ev) {
 }
 };
 function dragEnd(ev){
-    let towers = document.querySelectorAll(".towerDropDiv");
-    for(let i=0; i<towers.length; i++) {
-        towers[i].style.backgroundColor = "rgba(255, 255, 255, 0)";
-        towers[i].style.border = "solid rgba(0, 0, 0, 0)";
-    }
-    radDiv.style.visibility = "hidden";
-    
-    
+grassBacklightOff()
+dirtAddListener()
+radDiv.style.visibility = "hidden";
 };
+
 function displayStats(ev){
     radius = ev.target.getAttribute("radius");
     fireRate = ev.target.getAttribute("fireRate");
@@ -3196,20 +860,73 @@ function displayStats(ev){
     document.getElementById('p2').innerText = "Skill: " + special;
     document.getElementById('p3').innerText = "";
     document.getElementById('p4').innerText = "Damage: " + damage;
-    document.getElementById('p5').innerText = "Reload time: " + fireRate + "/c";
+    document.getElementById('p5').innerText = "Reload time: " + fireRate + "sec";
     document.getElementById('p6').innerText = "Radius: " + radius;
     document.getElementById('p7').innerText = "";
     document.getElementById('p8').innerText = "";
 
     let radDiv = document.getElementById("radDiv");
     radDiv.style.visibility = "visible";
-    radDiv.style.width = "10vw";
-    radDiv.style.height =  "20.26vh";
+    radDiv.style.width = radius * 10 + "vw";
+    radDiv.style.height = radius * 20.26 + "vh"; 
     radDiv.style.top = "38.8vh";
     radDiv.style.left = "37.2vw";
     radDiv.innerText = "Radius Comparison";
 
 };
+function displayDroppedStats(ev){
+    radius = ev.target.getAttribute("radius");
+    fireRate = ev.target.getAttribute("fireRate");
+    damage = ev.target.getAttribute("damage");
+    names = ev.target.getAttribute("name");
+    cost = ev.target.getAttribute("cost");
+    id = ev.target.getAttribute("id");
+    special = ev.target.getAttribute("special");
+
+    document.getElementById('imageDiv').innerHTML = "";
+    let img = document.createElement("img");
+    img.src = ev.target.getAttribute("src");
+    img.style.width = "5vw";
+    img.style.height = "10vh";
+    img.style.display = "block";
+    img.style.borderRadius = "1vw";
+    img.style.padding = "0";
+    img.style.zIndex = "4";
+    document.getElementById('p1').innerText = "";
+    document.getElementById('p2').innerText = "";
+    document.getElementById('p3').innerText = "";
+    document.getElementById('p4').innerText = "";
+    document.getElementById('p5').innerText = "";
+    document.getElementById('p6').innerText = "";
+    document.getElementById('p7').innerText = "";
+    document.getElementById('p8').innerText = "";
+
+    document.getElementById('imageDiv').appendChild(img);
+    document.getElementById('p1').innerText = "Cost: " + cost;
+    document.getElementById('p2').innerText = "Skill: " + special;
+    document.getElementById('p3').innerText = "";
+    document.getElementById('p4').innerText = "Damage: " + damage;
+    document.getElementById('p5').innerText = "Reload time: " + fireRate + "c";
+    document.getElementById('p6').innerText = "Radius: " + radius;
+    document.getElementById('p7').innerText = "";
+    document.getElementById('p8').innerText = "";
+
+    let radDiv = document.getElementById("radDiv");
+    radDiv.style.visibility = "visible";
+    radDiv.style.width = radius * 10 + "vw";
+    radDiv.innerText = "";
+    radDiv.style.height = radius * 20.26 + "vh";      
+    topDist = ev.target.getBoundingClientRect().top * (100 / document.documentElement.clientHeight);
+    radiusH = radDiv.clientHeight * (100 / document.documentElement.clientHeight)/2;
+    squareRadiusH = ev.target.clientHeight * (100 / document.documentElement.clientHeight)/2;
+
+    leftDist = ev.target.getBoundingClientRect().left * (100 / document.documentElement.clientWidth);
+    radiusW = radDiv.clientWidth * (100 / document.documentElement.clientWidth)/2;
+    squareRadiusW = ev.target.clientWidth * (100 / document.documentElement.clientWidth)/2;
+
+    radDiv.style.top = topDist - radiusH + squareRadiusH + "vh";
+    radDiv.style.left = leftDist - radiusW + squareRadiusW + "vw";
+}
 function hideRadius(e){
     let radDiv = document.getElementById("radDiv");
     radDiv.style.visibility = "hidden";
@@ -3283,59 +1000,206 @@ function displaySpellStats(ev){
     document.getElementById('p5').innerText = "";
     document.getElementById('p6').innerText = "";
 };
-function frameAction(picture,hpBar,mobName){
+
+
+
+async function frameAction(picture,hpBar,mobName){
     let rectp = picture.getBoundingClientRect();
     let midpx = rectp.left + rectp.width/2;
     let midpy = rectp.top + rectp.height/2;
-    let ftd = document.getElementsByClassName('dropedTower');// dropedTower
-// // RELOADING FUNCTION
-for(let i=0; i<ftd.length; i++) {
-//     let reloading = Number(ftd[i].getAttribute('reloading'));
-//     //console.log("Recharging " + Number(ftd[i].getAttribute('reloading')))
-//     if (reloading >= 100){
-//         ftd[i].setAttribute('ready' , 1);
-//         //console.log('Ready!!!')
-//     } else{
-//         let a = ftd[i].getAttribute('reloadRate')
-//         let reloadRate = 5 / a;
-//         reloading += Number(reloadRate);
-//         //console.log(reloading)
-//         ftd[i].setAttribute('reloading' , reloading);
-//     }
-//     //END OF RELOADING FUNCTION
+    let ftd = document.getElementsByClassName('dropedTower');
+    if (picture.getAttribute("stunned") > 0){
+        let stunTime = picture.getAttribute("stunned");
+        stunTime -= 1;
+        picture.setAttribute("stunned",stunTime)
+        if (stunTime == 0){
+        if (picture.getAttribute("stopped") > 0){}
+        else{
+        picture.style.animationPlayState = 'running';
+        hpBar.style.animationPlayState = 'running'; 
+        if (document.getElementById(picture.getAttribute("stunImgId"))){
+            document.getElementById(picture.getAttribute("stunImgId")).remove()
+        }
+        }
+        }
 
+    }
+    if (picture.getAttribute("stopped") > 0){
+        let stopped = picture.getAttribute("stopped");
+        stopped -= 1;
+        picture.setAttribute("stopped",stopped)
+        if (stopped == 0){
+        if(picture.getAttribute("stunned") > 0){}
+        else{picture.style.animationPlayState = 'running';
+        hpBar.style.animationPlayState = 'running';
+        if (document.getElementById(picture.getAttribute("stopimgId"))){
+            document.getElementById(picture.getAttribute("stopimgId")).remove()
+        }
+     }
+        }
+    }
+for(let i=0; i<ftd.length; i++) {
+if (ftd[i].getAttribute("dmgBoost") != 0){
+    let dmgBoostTime = ftd[i].getAttribute("dmgBoost");
+    dmgBoostTime -= 1 / document.querySelectorAll(".mobOnField").length ;
+    ftd[i].setAttribute("dmgBoost",dmgBoostTime)
+    if (dmgBoostTime <= 0){
+    ftd[i].classList.remove("glowTower")
+    ftd[i].setAttribute("damage", ftd[i].getAttribute("damage")/1.3)
+    }
+}
 
 let compmidx = ftd[i].getAttribute('midx');
 let compmidy = ftd[i].getAttribute('midy');
 let radius = ftd[i].getAttribute('radius');
 let damage = ftd[i].getAttribute('damage');
 let fireRate = ftd[i].getAttribute('fireRate');
-
-let complenght = Math.sqrt((midpx-compmidx)*(midpx-compmidx)+(midpy-compmidy)*(midpy-compmidy));
-    if (complenght <= radius) {
+let towerName =  ftd[i].getAttribute('name');
+compmidx = compmidx * document.documentElement.clientWidth / 100 
+compmidy = compmidy * document.documentElement.clientHeight / 100
+// let complenght = Math.sqrt((midpx-compmidx)*(midpx-compmidx)+(midpy-compmidy)*(midpy-compmidy));
+let axeWidth = radius * 5 * document.documentElement.clientWidth / 100 // після радіуса множник до vw
+let axeHeight = radius * 10.14 * document.documentElement.clientHeight / 100
+if  (axeWidth>=axeHeight){
+    if (((midpx-compmidx)*(midpx-compmidx)/axeWidth/axeWidth + 
+    (midpy-compmidy)*(midpy-compmidy)/axeHeight/axeHeight)<= 1){
         let ready = ftd[i].getAttribute('ready');
     if (ready == 1){
+        if  (towerName == "Кирило"){
+        boostDamage(compmidx,compmidy,ftd,radius)
+        ftd[i].setAttribute('ready' , 0);
+        reloadFunction(ftd,i,fireRate)
+        }
+        else{
+        bulletFire(compmidx,compmidy,midpx,midpy,towerName)
         ftd[i].setAttribute('ready' , 0);
         reloadFunction(ftd,i,fireRate)
         let life = picture.getAttribute('life');
+        // await sleep(500)
         life -= damage;
         picture.setAttribute('life' , life);
+        
+        if  (towerName == "Владислав"){stunning(picture,hpBar,midpx,midpy)}
         PrimalLife = document.getElementById(mobName).getAttribute("life");
         if (life/PrimalLife < 0.84 && life/PrimalLife >= 0.66){
-            hpBar.style.width = "2.5vw";
+            hpBar.style.width = "1.8vw";
         } else if(life/PrimalLife < 0.66 && life/PrimalLife >= 0.5) {
-            hpBar.style.width = "2vw";
+            hpBar.style.width = "1.4vw";
         } else if(life/PrimalLife < 0.5 && life/PrimalLife >= 0.33) {
-            hpBar.style.width = "1.5vw";
+            hpBar.style.width = "1.1vw";
         } else if(life/PrimalLife < 0.33 && life/PrimalLife >= 0.16) {
-            hpBar.style.width = "1vw";
+            hpBar.style.width = "0.73vw";
         } else if (life/PrimalLife < 0.16){
-            hpBar.style.width = "0.5vw";
+            hpBar.style.width = "0.37vw";
         }
         }
-    }  
-};   
+        }
+    }
+} else if  (axeWidth<axeHeight){
+    if (((midpx-compmidx)*(midpx-compmidx)/axeHeight/axeHeight + 
+    (midpy-compmidy)*(midpy-compmidy)/axeWidth/axeWidth)<= 1){
+    let ready = ftd[i].getAttribute('ready');
+        if (ready == 1){
+    if  (towerName == "Кирило"){
+    boostDamage(compmidx,compmidy,ftd,radius)
+    ftd[i].setAttribute('ready' , 0);
+    reloadFunction(ftd,i,fireRate)
+    }
+        else{
+    bulletFire(compmidx,compmidy,midpx,midpy,towerName)
+    ftd[i].setAttribute('ready' , 0);
+    reloadFunction(ftd,i,fireRate)
+    let life = picture.getAttribute('life');
+    // await sleep(500)
+    life -= damage;
+    picture.setAttribute('life' , life);
+    
+    if  (towerName == "Владислав"){stunning(picture,hpBar,midpx,midpy)}
+    PrimalLife = document.getElementById(mobName).getAttribute("life");
+    if (life/PrimalLife < 0.84 && life/PrimalLife >= 0.66){
+        hpBar.style.width = "1.8vw";
+    } else if(life/PrimalLife < 0.66 && life/PrimalLife >= 0.5) {
+        hpBar.style.width = "1.4vw";
+    } else if(life/PrimalLife < 0.5 && life/PrimalLife >= 0.33) {
+        hpBar.style.width = "1.1vw";
+    } else if(life/PrimalLife < 0.33 && life/PrimalLife >= 0.16) {
+        hpBar.style.width = "0.73vw";
+    } else if (life/PrimalLife < 0.16){
+        hpBar.style.width = "0.37vw";
+    }
+        }
+    } 
+        }
+} else{}
+    };   
 };
+function boostDamage(compmidx,compmidy,ftd,radius){
+    
+    for(let i=0; i<ftd.length; i++){
+    let compmidxx = ftd[i].getAttribute('midx');
+    let compmidyy = ftd[i].getAttribute('midy');
+    let axeWidth = radius * 5 * document.documentElement.clientWidth / 100 // після радіуса множник до vw
+    let axeHeight = radius * 10.14 * document.documentElement.clientHeight / 100
+    compmidxx = compmidxx * document.documentElement.clientWidth / 100 
+    compmidyy = compmidyy * document.documentElement.clientHeight / 100
+    if  (axeWidth>=axeHeight){
+    if (((compmidxx-compmidx)*(compmidxx-compmidx)/axeWidth/axeWidth + 
+    (compmidyy-compmidy)*(compmidyy-compmidy)/axeHeight/axeHeight)<= 1){
+
+    ftd[i].setAttribute("dmgBoost",100)
+    ftd[i].setAttribute("damage",ftd[i].getAttribute("damage")*1.3)
+    ftd[i].classList.add("glowTower") 
+
+        }
+    }else if  (axeWidth<axeHeight){
+    if (((compmidxx-compmidx)*(compmidxx-compmidx)/axeHeight/axeHeight + 
+    (compmidyy-compmidy)*(compmidyy-compmidy)/axeWidth/axeWidth)<= 1){
+        ftd[i].setAttribute("dmgBoost",100)
+        ftd[i].setAttribute("damage",ftd[i].getAttribute("damage")*1.3)
+        ftd[i].classList.add("glowTower") 
+
+    }
+        }
+    }
+}
+
+async function bulletFire(compmidx,compmidy,midpx,midpy,towerName){
+    let xstep = (midpx-compmidx)/20
+    let ystep = (midpy-compmidy)/20
+    let dodx = 0;
+    let dody = 0;
+    let img = document.createElement("img");
+    if (towerName == "Євгеній"){
+    img.src = "pictures/бургер.png";
+    }
+    if (towerName == "Андрій"){
+        img.src = "pictures/бургер.png";
+    }
+    if (towerName == "Дімітрій"){
+        img.src = "pictures/каблук.png";
+        img.classList.add("rotateBullet")
+    }
+    img.style.width = "1.5vw";
+    img.style.opacity = "1";
+    img.style.height = "3vh";
+    img.style.display = "block";
+    img.style.position = "absolute";
+    img.style.padding = "0";
+    img.style.zIndex = "6";
+    img.style.top = Number(compmidy * (100 / document.documentElement.clientHeight)) - 1 + "vh"; 
+    img.style.left = Number(compmidx * (100 / document.documentElement.clientWidth)) - 0.5 + "vw";
+    document.getElementById('body').appendChild(img);
+    for(let i=0; i<20; i++){
+        dodx += xstep;
+        dody += ystep;
+        img.style.left = Number(Number(Number(compmidx) + Number(dodx)) * (100 / document.documentElement.clientWidth)) - 0.5 + "vw";
+        img.style.top =  Number(Number(Number(compmidy) + Number(dody)) * (100 / document.documentElement.clientHeight)) - 1 + "vh"; 
+        await sleep(25)
+    }
+    img.remove();
+    
+};
+
 function HealframeAction(picture){
     let ready = picture.getAttribute('ready');
     let healReloading = picture.getAttribute('healReloading');
@@ -3424,6 +1288,7 @@ async function healDivFunction(healDiv){
     await sleep(1000);
     healDiv.remove();
 }
+
 async function towerOption(ev){
     towerSelling = ev.target
     document.addEventListener("click",cancelSell)
@@ -3445,7 +1310,7 @@ async function towerOption(ev){
     option1.style.position = "absolute";
     option1.style.padding = "0";
     option1.style.zIndex = "5";
-    option1.style.top = midpy + "vh"; 
+    option1.style.top = midpy + "vh";
     option1.style.left = midpx + "vw";
     document.getElementById('body').appendChild(option1);
     funcAddListener(option1)
@@ -3496,17 +1361,258 @@ function funcAddListener(option1){
     option1.addEventListener("click",sell)
 }
 
+function stunning(picture,hpBar,midpx,midpy){
+picture.style.animationPlayState = 'paused';
+hpBar.style.animationPlayState = 'paused';
+if (picture.getAttribute("stunned") > 0){
+    picture.setAttribute("stunned",5)
+    return
+}
+if (picture.getAttribute("stopped") > 0){
+    return
+}
+let stunimg = document.createElement("img");
+stunimg.id = "stunImgId" + stunImgId;
+picture.setAttribute("stunImgId","stunImgId" + stunImgId)
+stunimg.setAttribute("iAmStunPicture",1);
+stunimg.src = "pictures/stunimg.png"
+stunimg.style.width = "2vw";
+stunimg.style.opacity = "1";
+stunimg.style.height = "4vh";
+stunimg.style.display = "block";
+stunimg.style.position = "absolute";
+stunimg.style.padding = "0";
+stunimg.style.zIndex = "5";
+stunImgId += 1;
+stunimg.style.top = Number(midpy * (100 / document.documentElement.clientHeight)) - 6.5 + "vh"; 
+stunimg.style.left = Number(midpx * (100 / document.documentElement.clientWidth)) - 0.85 + "vw";
+document.getElementById('body').appendChild(stunimg);
+picture.setAttribute("stunned",5)
+}
 
-
-
-
-
-
-
-
-
-
+function pivoSpell(ev){
+    document.getElementById("розлитиПиво").classList.add("glowSpell")
+    let escDiv = document.createElement("div")
+    escDiv.classList.add("cancelDiv")
+    escDiv.id = "escDivId"
+    escDiv.innerText = '"Esc" to cancel';
+    document.getElementById('body').appendChild(escDiv);
+    document.addEventListener('keydown', escListener)
+    document.getElementById("розлитиПиво").removeEventListener("click",pivoSpell)
+    document.getElementById("розлитиПиво").addEventListener("click",pivoSpellDeny)
+    ev.stopPropagation()
+    document.getElementById("mainframe").addEventListener("click",pivoSpellClick)
     
+    grassRemoveListener()
+    dirtBacklightOn()
+
+// ev.dataTransfer.setData("text", ev.target.id);
+// ev.dataTransfer.setData("cost", ev.target.getAttribute('cost'));
+}
+function escListener(ev){
+if(ev.key === 'Escape') {
+document.removeEventListener('keydown', escListener)
+document.getElementById("розлитиПиво").classList.remove("glowSpell")
+document.getElementById("escDivId").remove()
+document.getElementById("розлитиПиво").addEventListener("click",pivoSpell)
+document.getElementById("розлитиПиво").removeEventListener("click",pivoSpellDeny)
+
+grassAddListener()
+dirtBacklightOff()
+}
+}
+function pivoSpellDeny(){
+document.removeEventListener('keydown', escListener)
+document.getElementById("розлитиПиво").classList.remove("glowSpell")
+document.getElementById("escDivId").remove()
+document.getElementById("розлитиПиво").removeEventListener("click",pivoSpellDeny)
+document.getElementById("розлитиПиво").addEventListener("click",pivoSpell)
+
+grassAddListener()
+dirtBacklightOff()
+}
+function pivoSpellDrop(){
+    
+    // let compmidx =   ;
+    // let compmidy =   ;
+    let radius = ftd[i].getAttribute('radius');// spell instead of ftd[i]
+    let mobs = document.querySelectorAll(".mobOnField")
+    for(let i=0; i<mobs.length; i++) {
+        let rectp = mobs[i].getBoundingClientRect();
+        let midpx = rectp.left + rectp.width/2;
+        let midpy = rectp.top + rectp.height/2;
+    
+        let axeWidth = radius * 5 * document.documentElement.clientWidth / 100 // після радіуса множник до vw
+        let axeHeight = radius * 10.14 * document.documentElement.clientHeight / 100
+    
+        if  (axeWidth>=axeHeight){
+            if (((midpx-compmidx)*(midpx-compmidx)/axeWidth/axeWidth + 
+            (midpy-compmidy)*(midpy-compmidy)/axeHeight/axeHeight)<= 1){
+    
+    
+            // asadad
+        }else if  (axeWidth<axeHeight){
+        if (((midpx-compmidx)*(midpx-compmidx)/axeHeight/axeHeight + 
+        (midpy-compmidy)*(midpy-compmidy)/axeWidth/axeWidth)<= 1){
+            // sada
+    
+        }
+    }
+        }
+    }
+}
+function pivoSpellClick(ev){
+    let cost = document.getElementById("розлитиПиво").getAttribute("cost")
+    let compmidx = ev.pageX;
+    let compmidy = ev.pageY;
+    let radius = document.getElementById("розлитиПиво").getAttribute('radius');// spell instead of ftd[i]
+    let axeWidth = radius * 5 * document.documentElement.clientWidth / 100 // після радіуса множник до vw
+    let axeHeight = radius * 10.14 * document.documentElement.clientHeight / 100
+    let mobs = document.querySelectorAll(".mobOnField")
+    for(let i=0; i<mobs.length; i++) {
+        let rectp = mobs[i].getBoundingClientRect();
+        let midpx = rectp.left + rectp.width/2;
+        let midpy = rectp.top + rectp.height/2;
+        if  (axeWidth>=axeHeight){
+            if (((midpx-compmidx)*(midpx-compmidx)/axeWidth/axeWidth + 
+            (midpy-compmidy)*(midpy-compmidy)/axeHeight/axeHeight)<= 1){
+if (Number(document.getElementById("mana").innerText) < Number(cost)){
+    NotEnoughtGold.play();
+    document.getElementById("mainframe").removeEventListener("click",pivoSpellClick)
+    return
+    }
+if (Number(document.getElementById("mana").innerText) >= Number(cost)){
+    document.getElementById("mana").innerText -= cost
+    if (mobs[i].getAttribute("stopped") != 0){
+        mobs[i].getAttribute("stopped",100)
+        return
+    }  
+    document.getElementById("mainframe").removeEventListener("click",pivoSpellClick)
+    mobs[i].style.animationPlayState = 'paused';
+    mobs[i].setAttribute("stopped",100)
+    document.getElementById("bar"+mobs[i].getAttribute("id")).style.animationPlayState = 'paused';
+    let stopimg = document.createElement("img");
+    stopimg.src = "pictures/redx.png";
+    stopimg.style.width = "2.2vw";
+    stopimg.style.opacity = "1";
+    stopimg.style.height = "4.5vh";
+    stopimg.style.display = "block";
+    stopimg.style.position = "absolute";
+    stopimg.style.padding = "0";
+    stopimg.style.zIndex = "5";
+    stopimgId += 1;
+    stopimg.id = "stopimgId" + stopimgId;
+    stopimg.style.top = Number(rectp.top * (100 / document.documentElement.clientHeight)) + "vh"; 
+    stopimg.style.left = Number(rectp.left * (100 / document.documentElement.clientWidth)) + "vw";
+    document.getElementById('body').appendChild(stopimg);
+    mobs[i].setAttribute("stopimgId","stopimgId" + stopimgId);
+}
+            }
+        }else if (axeWidth<axeHeight){
+            if (((midpx-compmidx)*(midpx-compmidx)/axeHeight/axeHeight + 
+            (midpy-compmidy)*(midpy-compmidy)/axeWidth/axeWidth)<= 1){
+if (Number(document.getElementById("mana").innerText) < Number(cost)){
+    NotEnoughtGold.play();
+    document.getElementById("mainframe").removeEventListener("click",pivoSpellClick)
+    return
+    }
+if (Number(document.getElementById("mana").innerText) >= Number(cost)){
+    document.getElementById("mana").innerText -= cost
+    if (mobs[i].getAttribute("stopped") != 0){
+        mobs[i].getAttribute("stopped",100)
+        return
+    }  
+    document.getElementById("mainframe").removeEventListener("click",pivoSpellClick)
+    mobs[i].style.animationPlayState = 'paused';
+    mobs[i].setAttribute("stopped",100)
+    document.getElementById("bar"+mobs[i].getAttribute("id")).style.animationPlayState = 'paused';
+    let stopimg = document.createElement("img");
+    stopimg.src = "pictures/redx.png";
+    stopimg.style.width = "2.2vw";
+    stopimg.style.opacity = "1";
+    stopimg.style.height = "4.5vh";
+    stopimg.style.display = "block";
+    stopimg.style.position = "absolute";
+    stopimg.style.padding = "0";
+    stopimg.style.zIndex = "5";
+    stopimgId += 1;
+    stopimg.id = "stopimgId" + stopimgId;
+    stopimg.style.top = Number(rectp.top * (100 / document.documentElement.clientHeight)) + "vh"; 
+    stopimg.style.left = Number(rectp.left * (100 / document.documentElement.clientWidth)) + "vw";
+    document.getElementById('body').appendChild(stopimg);
+    mobs[i].setAttribute("stopimgId","stopimgId" + stopimgId);
+}
+    }
+        }
+    }
+}
+
+
+
+function grassAddListener(){
+let grass = document.querySelectorAll(".towerDropDiv")
+for(let i=0; i<grass.length; i++) {
+    grass[i].addEventListener("dragover",allowDrop)
+    grass[i].addEventListener("drop",drop)
+}
+}
+function grassRemoveListener(){
+let grass = document.querySelectorAll(".towerDropDiv")
+for(let i=0; i<grass.length; i++) {
+    grass[i].removeEventListener("dragover",allowDrop)
+    grass[i].removeEventListener("drop",drop)
+    }
+}
+
+function dirtAddListener(){
+let roads = document.querySelectorAll(".spellDropDiv");
+for(let i=0; i<roads.length; i++) {
+    roads[i].addEventListener("dragover",allowdropSpell)
+    roads[i].addEventListener("drop",dropSpell)
+    }
+}
+function dirtRemoveListener(){
+let roads = document.querySelectorAll(".spellDropDiv");
+for(let i=0; i<roads.length; i++) {
+    roads[i].removeEventListener("dragover",allowdropSpell)
+    roads[i].removeEventListener("drop",dropSpell)
+    }
+}
+function dirtBacklightOn(){
+let roads = document.querySelectorAll(".spellDropDiv");
+for(let i=0; i<roads.length; i++) {
+    roads[i].style.backgroundColor = "rgba(255, 255, 255, 1)";
+    roads[i].style.border = "solid rgba(0, 0, 0, 1)";
+    }
+}
+function dirtBacklightOff(){
+    let roads = document.querySelectorAll(".spellDropDiv");
+    for(let i=0; i<roads.length; i++) {
+        roads[i].style.backgroundColor = "rgba(255, 255, 255, 0)";
+        roads[i].style.border = "solid rgba(0, 0, 0, 0)";
+        }
+}
+function grassBacklightOn(){
+for(let i=0; i<towers.length; i++) {
+towers[i].style.backgroundColor = "rgba(255, 255, 255, 1)";
+towers[i].style.border = "solid rgba(0, 0, 0, 1)";
+}
+}
+function grassBacklightOff(){
+let towers = document.querySelectorAll(".towerDropDiv");
+for(let i=0; i<towers.length; i++) {
+towers[i].style.backgroundColor = "rgba(255, 255, 255, 0)";
+towers[i].style.border = "solid rgba(0, 0, 0, 0)";
+}
+} 
+
+
+
+
+
+
+
+
 function changeTiles(){
     var table = document.getElementById("mainTable");
     
