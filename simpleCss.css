@@ -3,9 +3,15 @@
     flex-direction: column;
 }
 #sonyaDiv{
+    padding: 1vh;
+    border: 1vh solid red;
+    border-radius: 1vh;
     margin-bottom: 5vh;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 30vh;
+    width: 25vw;
 }
 #paswordInput{
     height:6vh;

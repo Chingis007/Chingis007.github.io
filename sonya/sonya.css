@@ -303,12 +303,12 @@
     }
     #banana-left{
       left: 20vw;
-      width: 12vw;
+      width: 14vw;
       height: 15vh;
     }
     #banana-right{
       right: 20vw;
-      width: 12vw;
+      width: 14vw;
       height: 15vh;
     }
     @keyframes movemMus {

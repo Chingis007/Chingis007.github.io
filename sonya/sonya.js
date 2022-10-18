@@ -90,6 +90,7 @@ const handleOnClick = index => {
         document.getElementById("banana-right").classList.add("visible1")
         document.getElementById("smallt").innerText = "Sending you the biggest hug";
         document.getElementById("bigt").innerText = "EVER";
+        document.getElementById("bigt").style.color = "#79ec40"
         document.getElementById("title").classList.remove("rightTop")
         document.getElementById("title").classList.add("centered")
         document.getElementById("gift").style.visibility = "visible";
