@@ -1,6 +1,7 @@
 #mainDiv{
     display: flex;
     flex-direction: column;
+    width: 360px;
 }
 #sonyaDiv{
     padding: 1vh;
