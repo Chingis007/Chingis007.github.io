@@ -11,11 +11,10 @@
     flex-direction: column;
     justify-content: space-between;
     height: 30vh;
-    width: 50vw;
+    width: 350px;
 }
 #paswordInput{
     height:6vh;
-    width: 20vw;
 }
 button{
     margin-right: 2vw;
