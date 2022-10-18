@@ -48,9 +48,9 @@
     pointer-events: none;
     width: 50vw;
     z-index: 3;
-    left: 50%;
+    left: 60%;
     position: absolute;
-    top: 50%;
+    top: 60%;
     transform: translate(-50%, -50%);
   }
 
