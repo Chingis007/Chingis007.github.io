@@ -80,8 +80,9 @@ const handleOnClick = index => {
         document.getElementById("title").classList.add("LeftTop")
     }
     if (textCount == 5){
-      document.getElementById("smalltt").innerText = "";
-      document.getElementById("bigtt").innerText = "";
+        document.getElementById("smalltt").innerText = "";
+        document.getElementById("bigtt").innerText = "";
+        document.getElementById("musDiv").style.visibility = "visible";
         document.getElementById("banana-left").classList.add("visible1")
         document.getElementById("banana-right").classList.add("visible1")
         document.getElementById("smallt").innerText = "Sending you the biggest hug";
