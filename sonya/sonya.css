@@ -255,7 +255,7 @@
   @media(max-width: 768px){
     .simg{
       z-index: 5;
-      height: 30vh;
+      height: 25vh;
       width: 30vw;
       position: absolute;
       pointer-events: none;
@@ -275,7 +275,7 @@
           transform: translateX(100%);
       }
       100%{
-          transform: translateX(280%) translateY(150%) rotate(-365deg);
+          transform: translateX(280%) translateY(125%) rotate(-365deg);
       }
     }
 
