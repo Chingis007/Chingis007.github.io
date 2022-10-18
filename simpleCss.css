@@ -1,0 +1,16 @@
+#mainDiv{
+    display: flex;
+    flex-direction: column;
+}
+#sonyaDiv{
+    margin-bottom: 5vh;
+    display: flex;
+    align-items: center;
+}
+#paswordInput{
+    height:6vh;
+    width: 20vw;
+}
+button{
+    margin-right: 2vw;
+}

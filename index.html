@@ -1,6 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="simpleCss.css">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Starting page</title>
+</head>
 <body>
-    <h1>Starting page</h1>
-    <h2 style="color:black;">select your destination</h2>
-    <a href="/sonya/sonya.html"><button>Sonya</button></a>
-    <a href="towerdef.html"><button disabled>Tower Defence</button></a>
+    <h1 style="font-size: 40px;">Starting page</h1>
+    <h2 style="color:black;font-size: 40px;">select your destination</h2>
+    <div id="mainDiv">    
+        <div id="sonyaDiv">
+            <a href="sonya/sonya.html"><button disabled id="disBut" style="font-size: 40px;">Sonya</button></a>
+            <b style="font-size:40px;">Password:</b>
+            <form action="">
+                <input style="font-size:40px;"  id="paswordInput" type="text">
+            </form>
+            <button onclick="permission()" style="font-size:40px;"> Check</button>
+        </div>
+        <a href="towerdef.html"><button disabled style="font-size: 40px;">Tower Defence</button></a>
+    </div>
+
+    <script src="simpleJs.js"></script>
 </body>
+</html>
