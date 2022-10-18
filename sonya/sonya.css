@@ -31,11 +31,16 @@
     top: 0;
     transform: translate(0, 0);
   }
+  .leftTop {
+    left: 0;
+    position: absolute;
+    top: 0;
+    transform: translate(0, 0);
+  }
 
   #clickMe {
     color: red;
     animation: click 2s ease-in-out;
-    
     animation-iteration-count: infinite;
     font-family: "Rubik", sans-serif;
     font-size: 6vw;
@@ -43,6 +48,10 @@
     pointer-events: none;
     width: 50vw;
     z-index: 3;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
   }
 
   @keyframes click{
@@ -71,27 +80,34 @@
     cursor: pointer;
     position: relative;
   }
-
+  #mainCenteringDiv{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   #title {
     color: white;
     font-family: "Rubik", sans-serif;
     font-size: 6vw;
-    margin: 0px;
     pointer-events: none;
+    text-align: center;
     transition: opacity 1200ms ease;
-    width: 50vw;
     z-index: 3;
   }
-  
-  #title > .fancy {
+    .fancy {
     color: var(--g2);
+    text-align: center;
     font-family: 'Dancing Script', cursive;
-    font-size: 1.5em;
-    line-height: 0.9em;
+    font-size: 8vw;
     margin: 0;
   }
 
-  body.toggled > #title {
+  body.toggled > #mainCenteringDiv > #title {
     opacity: 0;
   }
 
@@ -104,12 +120,12 @@
   }
 
   .left{
-    left: -20vw;
+    left: -30vw;
     top: 10vh;
   }
 
   .right{
-    right: -20vw;
+    right: -30vw;
     top: 10vh;
   }
 
@@ -126,7 +142,7 @@
         transform: translateX(100%);
     }
     100%{
-        transform: translateX(-580%) rotate(-355deg);
+        transform: translateX(-650%) rotate(-355deg);
     }
   }
 
@@ -135,7 +151,7 @@
         transform: translateX(100%);
     }
     100%{
-        transform: translateX(580%) translateY(100%) rotate(-365deg);
+        transform: translateX(650%) translateY(100%) rotate(-365deg);
     }
   }
 
@@ -190,6 +206,9 @@
   .visible{
     animation: aboba 1s 3s forwards;
   }
+  .visible1{
+    animation: aboba 1s 1s forwards;
+  }
   @keyframes aboba {
     0%{
         opacity: 0;
@@ -203,26 +222,121 @@
     z-index: 200;
     height: 13vh;
     width: 6vw;
-    position: absolute;
-    left: 40vw;
-    top: 15vh;
     opacity: 0;
     pointer-events: none;
   }
-
   #banana-right{
     z-index: 200;
     height: 13vh;
     width: 6vw;
-    position: absolute;
-    right: 40vw;
-    top: 15vh;
     opacity: 0;
     pointer-events: none;
   }
-  i{
+  #musDiv{
+    z-index: 200;
+    opacity: 0;
+  }
+  #centeringDiv{
     position: absolute;
-    top: 16vh;
-    left: -20vw;
-    z-index: 250;
+    top: 0;
+    left: 0;
+    height: 45%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  @media(max-width: 768px){
+    .simg{
+      z-index: 5;
+      height: 30vh;
+      width: 30vw;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    @keyframes toLeft {
+      0%{
+          transform: translateX(100%);
+      }
+      100%{
+          transform: translateX(-280%) rotate(-355deg);
+      }
+    }
+
+    @keyframes toRight {
+      0%{
+          transform: translateX(100%);
+      }
+      100%{
+          transform: translateX(280%) translateY(150%) rotate(-365deg);
+      }
+    }
+
+    #textleft{
+      font-size: 3.5vw;
+      right: 55vw;
+      bottom: 20vh;
+      height: 20vh;
+      width: 30vw;
+    }
+
+    #textright{
+      font-size: 3.5vw;
+      left: 55vw;
+      top: 15vh;
+      z-index: 200;
+      height: 20vh;
+      width: 13vw;
+    }
+    #gift{
+      width: 20vw;
+    }
+    #banana-left{
+      left: 20vw;
+      width: 12vw;
+      height: 15vh;
+    }
+    #banana-right{
+      right: 20vw;
+      width: 12vw;
+      height: 15vh;
+    }
+    @keyframes movemMus {
+      0%{
+          transform: translateX(100%);
+      }
+      100%{
+          transform: translateX(440%);
+      }
+    }
+    #title {
+      color: white;
+      font-family: "Rubik", sans-serif;
+      font-size: 11vw;
+    }
+    .fancy {
+      color: var(--g2);
+      font-family: 'Dancing Script', cursive;
+      font-size: 18vw;
+      margin: 0;
+    }
+    
+  #clickMe {
+    color: red;
+    animation: click 2s ease-in-out;
+    animation-iteration-count: infinite;
+    font-family: "Rubik", sans-serif;
+    font-size: 8vw;
+    margin: 0px;
+    pointer-events: none;
+    width: 50vw;
+    z-index: 3;
+    left: 55%;
+    position: absolute;
+    top: 70%;
+    transform: translate(-50%, -50%);
+  }
+    
   }

@@ -3,7 +3,7 @@ simplePhrases=["Happy birthday","b","g","d","Send you biggest hug"]
 bigPhrases=["Sonya","","and " ]
 let count = -1;
 
-const congratMusic = new Audio("music/привітання.ogg");
+const congratMusic = new Audio("/music/привітання.ogg");
 
 function playmusic(){
   congratMusic.play()
@@ -72,27 +72,30 @@ const handleOnClick = index => {
         document.getElementsByClassName("left")[0].remove()
         document.getElementById("textleft").remove()
         document.getElementById("textright").remove()
-        document.getElementById("smallt").innerText = "І головне";
-        document.getElementById("bigt").innerText = "Шоб dick стояв";
+        document.getElementById("smallt").innerText = "А головне шоб dick";
+        document.getElementById("bigt").innerText = "стояв";
+        document.getElementById("smalltt").innerText = "Та сердце";
+        document.getElementById("bigtt").innerText = "билось";
         document.getElementById("title").classList.remove("leftMid")
-        document.getElementById("title").classList.add("rightTop")
+        document.getElementById("title").classList.add("LeftTop")
     }
     if (textCount == 5){
-        document.getElementById("banana-left").classList.add("visible")
-        document.getElementById("banana-right").classList.add("visible")
+      document.getElementById("smalltt").innerText = "";
+      document.getElementById("bigtt").innerText = "";
+        document.getElementById("banana-left").classList.add("visible1")
+        document.getElementById("banana-right").classList.add("visible1")
         document.getElementById("smallt").innerText = "Sending you the biggest hug";
         document.getElementById("bigt").innerText = "EVER";
         document.getElementById("title").classList.remove("rightTop")
         document.getElementById("title").classList.add("centered")
         document.getElementById("gift").style.visibility = "visible";
-        document.getElementById("musici").style.visibility = "visible";
-        document.getElementById("musici").style.left = "48vw"
+        document.getElementById("musDiv").classList.add("visible1")
     }
     if (textCount == 6){toggle();
       document.getElementById("banana-left").remove()
       document.getElementById("banana-right").remove()
       document.getElementById("gift").remove()
-      document.getElementById("musici").remove()}
+      document.getElementById("musDiv").remove()}
     if (textCount == 7){
       toggle();
       document.getElementById("smallt").innerText = "THE END";
